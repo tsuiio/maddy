@@ -10,6 +10,7 @@ env:
 
 jobs:
   build:
+<<<<<<< HEAD
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -17,6 +18,18 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm64
+=======
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-24.04
+            platform: linux/amd64
+          - os: ubuntu-24.04-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.os }}
+>>>>>>> main
 
     steps:
       - name: Checkout
@@ -73,7 +86,11 @@ jobs:
           retention-days: 1
 
   merge:
+<<<<<<< HEAD
     runs-on: ubuntu-latest
+=======
+    runs-on: ubuntu-24.04
+>>>>>>> main
     needs:
       - build
     steps:
@@ -101,18 +118,28 @@ jobs:
           images: ${{ env.REGISTRY  }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha
+<<<<<<< HEAD
             type=ref,event=branch
             type=ref,event=pr
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}},enable={{is_default_branch}}
             type=semver,pattern={{major}},enable={{is_default_branch}}
             type=semver,pattern={{major}}.{{minor}}
+=======
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+>>>>>>> main
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+<<<<<<< HEAD
           $(printf '${{ env.REGISTRY  }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+=======
+          $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+>>>>>>> main
 
       - name: Retrieve image
         id: retrieve-image
